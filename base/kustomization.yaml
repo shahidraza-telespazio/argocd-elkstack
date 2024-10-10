@@ -5,6 +5,7 @@ namespace: logging
 
 resources:
   - namespace.yaml
+  - secrets.yaml
 
 helmCharts:
   - name: elasticsearch
