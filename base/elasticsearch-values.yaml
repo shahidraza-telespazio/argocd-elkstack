@@ -1,13 +1,29 @@
-replicas: 1
-minimumMasterNodes: 1
-ingress:
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: true
+
+secretMounts:
+  - name: elasticsearch-master-certs
+    secretName: elasticsearch-master-certs
+    path: "/usr/share/elasticsearch/config/certs"
+
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 9200
+      protocol: TCP
+      targetPort: 9200
+
+persistence:
   enabled: true
-  hosts:
-    - host: es-elk.s9.devopscloud.link # Change the hostname as required
-      paths:
-        - path: /
-volumeClaimTemplate:
-  accessModes: ["ReadWriteOnce"]
-  resources:
-    requests:
-      storage: 10Gi
+  size: 30Gi
+  storageClass: "default"
+
+resources:
+  limits:
+    memory: "4Gi"
+    cpu: "2"
+  requests:
+    memory: "2Gi"
+    cpu: "1"
