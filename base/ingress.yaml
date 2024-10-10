@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: logging-ingress
+  namespace: logging
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt"
+spec:
+  rules:
+    - host: dev.eodatahub.org.uk
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: elk-kibana # Kibana service name
+                port:
+                  number: 5601 # Kibana service port
+          - path: /elasticsearch
+            pathType: Prefix
+            backend:
+              service:
+                name: elk-elasticsearch # Elasticsearch service name
+                port:
+                  number: 9200 # Elasticsearch service port
+          - path: /logstash
+            pathType: Prefix
+            backend:
+              service:
+                name: elk-logstash # Logstash service name
+                port:
+                  number: 8080 # Logstash HTTP service port
