@@ -1,31 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: logging
+
 resources:
   - namespace.yaml
 
 helmCharts:
   - name: elasticsearch
-    chart: elastic/elasticsearch
-    version: 7.17.0
+    repo: https://helm.elastic.co
+    version: 8.5.1
     releaseName: elk-elasticsearch
     namespace: logging
     valuesFile: elasticsearch-values.yaml
 
   - name: kibana
-    chart: elastic/kibana
-    version: 7.17.0
+    repo: https://helm.elastic.co
+    version: 8.5.1
     releaseName: elk-kibana
     namespace: logging
     valuesFile: kibana-values.yaml
 
   - name: logstash
-    chart: elastic/logstash
-    version: 7.17.0
+    repo: https://helm.elastic.co
+    version: 8.5.1
     releaseName: elk-logstash
     namespace: logging
     valuesFile: logstash-values.yaml
 
   - name: filebeat
-    chart: elastic/filebeat
-    version: 7.17.0
+    repo: https://helm.elastic.co
+    version: 8.5.1
     releaseName: elk-filebeat
     namespace: logging
     valuesFile: filebeat-values.yaml
