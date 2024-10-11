@@ -1,3 +1,11 @@
+persistence:
+  enabled: true
+
+logstashConfig:
+  logstash.yml: |
+    http.host: 0.0.0.0
+    xpack.monitoring.enabled: false
+
 logstashPipeline:
   logstash.conf: |
     input {
@@ -5,32 +13,14 @@ logstashPipeline:
         port => 5044
       }
     }
-
     output {
       elasticsearch {
-        hosts => "https://elasticsearch-master:9200"
-        cacert => "/usr/share/logstash/config/elasticsearch-master-certs/ca.crt"
-        user => '${ELASTICSEARCH_USERNAME}'
-        password => '${ELASTICSEARCH_PASSWORD}'
+        hosts => "http://elasticsearch-master.logging.svc.cluster.local:9200"
+        manage_template => false
+        index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+        document_type => "%{[@metadata][type]}"
       }
     }
-
-extraEnvs:
-  - name: "ELASTICSEARCH_USERNAME"
-    valueFrom:
-      secretKeyRef:
-        name: elasticsearch-master-credentials
-        key: username
-  - name: "ELASTICSEARCH_PASSWORD"
-    valueFrom:
-      secretKeyRef:
-        name: elasticsearch-master-credentials
-        key: password
-
-secretMounts:
-  - name: "elasticsearch-master-certs"
-    secretName: "elasticsearch-master-certs"
-    path: "/usr/share/logstash/config/elasticsearch-master-certs"
 
 service:
   type: ClusterIP
