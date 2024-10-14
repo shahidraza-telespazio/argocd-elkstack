@@ -10,3 +10,4 @@ helmCharts:
     releaseName: elasticsearch
     namespace: monitoring
     version: 8.5.1
+    valuesFile: values.yaml
