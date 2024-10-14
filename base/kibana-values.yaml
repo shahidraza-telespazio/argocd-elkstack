@@ -1,9 +1,21 @@
-apiVersion: kibana.k8s.elastic.co/v1
-kind: Kibana
-metadata:
-  name: quickstart
-spec:
-  version: 8.13.4
-  count: 1
-  elasticsearchRef:
-    name: quickstart
+service:
+  type: LoadBalancer
+  port: 5601
+  loadBalancerIP: ""
+  nodePort: ""
+  annotations: {}
+  labels: {}
+
+resources:
+  limits:
+    memory: "2Gi"
+    cpu: "1"
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+
+dependencies:
+  - name: elasticsearch
+    version: "8.5.1"
+    repository: "https://helm.elastic.co"
+    condition: true

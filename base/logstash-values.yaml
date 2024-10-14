@@ -1,35 +1,51 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: logstash
-  labels:
-    app.kubernetes.io/name: elasticsearch-logstash
-    app.kubernetes.io/component: logstash
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: elasticsearch-logstash
-      app.kubernetes.io/component: logstash
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: elasticsearch-logstash
-        app.kubernetes.io/component: logstash
-    spec:
-      containers:
-        - name: logstash
-          image: docker.elastic.co/logstash/logstash:8.13.4
-          ports:
-            - name: "tcp-beats"
-              containerPort: 5044
-          env:
-            - name: ES_HOSTS
-              value: "https://quickstart-es-http:9200"
-            - name: ES_USER
-              value: "elastic"
-            - name: ES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: quickstart-es-elastic-user
-                  key: elastic
+logstashPipeline:
+  logstash.conf: |
+    input {
+      beats {
+        port => 5044
+      }
+    }
+
+    output {
+      elasticsearch {
+        hosts => "https://elasticsearch-master:9200"
+        cacert => "/usr/share/logstash/config/elasticsearch-master-certs/ca.crt"
+        user => '${ELASTICSEARCH_USERNAME}'
+        password => '${ELASTICSEARCH_PASSWORD}'
+      }
+    }
+
+extraEnvs:
+  - name: "ELASTICSEARCH_USERNAME"
+    valueFrom:
+      secretKeyRef:
+        name: elasticsearch-master-credentials
+        key: username
+  - name: "ELASTICSEARCH_PASSWORD"
+    valueFrom:
+      secretKeyRef:
+        name: elasticsearch-master-credentials
+        key: password
+
+secretMounts:
+  - name: "elasticsearch-master-certs"
+    secretName: "elasticsearch-master-certs"
+    path: "/usr/share/logstash/config/elasticsearch-master-certs"
+
+service:
+  type: ClusterIP
+  ports:
+    - name: beats
+      port: 5044
+      protocol: TCP
+      targetPort: 5044
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+
+dependencies:
+  - name: elasticsearch
+    version: "8.5.1"
+    repository: "https://helm.elastic.co"
+    condition: true
