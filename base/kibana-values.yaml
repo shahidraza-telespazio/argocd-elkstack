@@ -1,8 +1,15 @@
-elasticsearchHosts: "http://elasticsearch-master:9200"
-ingress:
-  enabled: true
-  className: "nginx"
-  hosts:
-    - host: kibana-elk.s9.devopscloud.link
-      paths:
-        - path: /
+service:
+  type: LoadBalancer
+  port: 5601
+  loadBalancerIP: ""
+  nodePort: ""
+  annotations: {}
+  labels: {}
+
+resources:
+  limits:
+    memory: "2Gi"
+    cpu: "1"
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
