@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: elasticsearch-logstash
+      app.kubernetes.io/component: logstash
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: elasticsearch-logstash
+        app.kubernetes.io/component: logstash
+    spec:
+      containers:
+        - name: logstash
+          image: docker.elastic.co/logstash/logstash:8.13.4
+          env:
+            - name: ES_HOSTS
+              value: "https://quickstart-es-http:9200"
+            - name: ES_USER
+              value: "elastic"
+            - name: ES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: quickstart-es-elastic-user
+                  key: elastic

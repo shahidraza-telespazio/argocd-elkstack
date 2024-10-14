@@ -5,7 +5,7 @@ namespace: logging
 
 resources:
   - namespace.yaml
-  - elasticsearch/
-  - kibana/
-  - logstash/
-  - filebeat/
+  - elasticsearch-values.yaml
+  - kibana-values.yaml
+  - filebeat-values.yaml
+  - logstash-values.yaml
