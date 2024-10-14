@@ -13,3 +13,6 @@ resources:
   requests:
     memory: "1Gi"
     cpu: "500m"
+
+annotations:
+  argocd.argoproj.io/sync-wave: "1"
