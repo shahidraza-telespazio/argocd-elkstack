@@ -3,15 +3,14 @@ kind: Kustomization
 
 resources:
   - ../../base
-
-patches:
-  - target:
-      kind: StatefulSet
-      name: elasticsearch-master
-    patch: |-
-      - op: add
-        path: /metadata/annotations/argocd.argoproj.io~1sync-wave
-        value : "-1"
-      - op: add
-        path: /metadata/annotations/argocd.argoproj.io~1sync-options
-        value: false
+# patches:
+#   - target:
+#       kind: StatefulSet
+#       name: elasticsearch-master
+#     patch: |-
+#       - op: add
+#         path: /metadata/annotations/argocd.argoproj.io~1sync-wave
+#         value : "-1"
+#       - op: add
+#         path: /metadata/annotations/argocd.argoproj.io~1sync-options
+#         value: false
