@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: logstash
+  labels:
+    app.kubernetes.io/name: elasticsearch-logstash
+    app.kubernetes.io/component: logstash
 spec:
   replicas: 1
   selector:
@@ -17,6 +20,9 @@ spec:
       containers:
         - name: logstash
           image: docker.elastic.co/logstash/logstash:8.13.4
+          ports:
+            - name: "tcp-beats"
+              containerPort: 5044
           env:
             - name: ES_HOSTS
               value: "https://quickstart-es-http:9200"

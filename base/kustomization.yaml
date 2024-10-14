@@ -9,3 +9,5 @@ resources:
   - kibana-values.yaml
   - filebeat-values.yaml
   - logstash-values.yaml
+  - logstash-config.yaml
+  - logstash-pipeline.yaml

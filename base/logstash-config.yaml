@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-config
+data:
+  logstash.yml: |
+    http.host: 0.0.0.0
+    pipeline.ecs_compatibility: disabled
+  pipelines.yml: |
+    - pipeline.id: logstash
+      path.config: "/usr/share/logstash/pipeline/logstash.conf"
