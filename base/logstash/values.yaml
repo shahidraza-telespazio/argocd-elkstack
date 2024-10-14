@@ -1,20 +1,3 @@
-logstashPipeline:
-  logstash.conf: |
-    input {
-      beats {
-        port => 5044
-      }
-    }
-
-    output {
-      elasticsearch {
-        hosts => "https://elasticsearch-master:9200"
-        cacert => "/usr/share/logstash/config/elasticsearch-master-certs/ca.crt"
-        user => '${ELASTICSEARCH_USERNAME}'
-        password => '${ELASTICSEARCH_PASSWORD}'
-      }
-    }
-
 extraEnvs:
   - name: "ELASTICSEARCH_USERNAME"
     valueFrom:
@@ -26,14 +9,30 @@ extraEnvs:
       secretKeyRef:
         name: elasticsearch-master-credentials
         key: password
+logstashPipeline:
+  logstash.conf: |
+    input {
+      beats {
+        port => 5044
+      }
+    }
 
+     output {
+      elasticsearch {
+        hosts => "https://elasticsearch-master:9200"
+        cacert => "/usr/share/logstash/config/elasticsearch-master-certs/ca.crt"
+        user => '${ELASTICSEARCH_USERNAME}'  # Elasticsearch username
+        password => '${ELASTICSEARCH_PASSWORD}' # Elasticsearch password
+      }
+    }
 secretMounts:
   - name: "elasticsearch-master-certs"
     secretName: "elasticsearch-master-certs"
     path: "/usr/share/logstash/config/elasticsearch-master-certs"
-
 service:
+  annotations: {}
   type: ClusterIP
+  loadBalancerIP: ""
   ports:
     - name: beats
       port: 5044
@@ -43,6 +42,3 @@ service:
       port: 8080
       protocol: TCP
       targetPort: 8080
-
-podAnnotations:
-  argocd.argoproj.io/sync-wave: "3"
