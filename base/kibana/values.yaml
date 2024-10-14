@@ -1,0 +1,6 @@
+type: LoadBalancer
+  loadBalancerIP: ""
+  port: 5601
+  nodePort: ""
+  labels: {}
+  annotations: {}
