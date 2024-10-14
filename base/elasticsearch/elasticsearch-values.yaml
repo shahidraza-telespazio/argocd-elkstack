@@ -27,6 +27,3 @@ resources:
   requests:
     memory: "2Gi"
     cpu: "1"
-
-annotations:
-  argocd.argoproj.io/sync-wave: "0"

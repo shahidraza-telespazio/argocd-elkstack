@@ -5,32 +5,7 @@ namespace: logging
 
 resources:
   - namespace.yaml
-
-helmCharts:
-  - name: elasticsearch
-    repo: https://helm.elastic.co
-    version: 8.5.1
-    releaseName: elk-elasticsearch
-    namespace: logging
-    valuesFile: elasticsearch-values.yaml
-
-  - name: kibana
-    repo: https://helm.elastic.co
-    version: 8.5.1
-    releaseName: elk-kibana
-    namespace: logging
-    valuesFile: kibana-values.yaml
-
-  - name: logstash
-    repo: https://helm.elastic.co
-    version: 8.5.1
-    releaseName: elk-logstash
-    namespace: logging
-    valuesFile: logstash-values.yaml
-
-  - name: filebeat
-    repo: https://helm.elastic.co
-    version: 8.5.1
-    releaseName: elk-filebeat
-    namespace: logging
-    valuesFile: filebeat-values.yaml
+  - elasticsearch/
+  - kibana/
+  - logstash/
+  - filebeat/

@@ -14,6 +14,8 @@ daemonset:
 
       output.logstash:
         hosts: ["elk-logstash-logstash:5044"]
-
-annotations:
-  argocd.argoproj.io/sync-wave: "3"
+dependencies:
+  - name: elasticsearch
+    version: "8.5.1"
+    repository: "https://helm.elastic.co"
+    condition: true
