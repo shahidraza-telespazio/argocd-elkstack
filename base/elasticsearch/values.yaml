@@ -27,3 +27,10 @@ resources:
   requests:
     memory: "2Gi"
     cpu: "1"
+
+readinessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 200
+  periodSeconds: 10
+  successThreshold: 3
+  timeoutSeconds: 5

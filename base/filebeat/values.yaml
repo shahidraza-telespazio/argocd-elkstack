@@ -13,3 +13,19 @@ filebeatConfig:
 
     output.logstash:
       hosts: ["logstash-logstash:5044"]
+
+resources:
+  requests:
+    cpu: "50m" # Reduce request
+    memory: "100Mi"
+  limits:
+    cpu: "500m" # Reduce limit
+    memory: "200Mi"
+
+daemonset:
+  enabled: false
+
+deployment:
+  enabled: true
+  replicas: 1 # Change this to the desired number of Filebeat pods
+
