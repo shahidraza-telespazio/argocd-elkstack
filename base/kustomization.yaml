@@ -5,7 +5,11 @@ namespace: monitoring
 
 resources:
   - namespace.yaml
-  - elasticsearch
-  - kibana
-  - logstash
-  - filebeat
+
+helmCharts:
+  - name: eck-stack
+    repo: https://helm.elastic.co
+    releaseName: eck-stack-with-logstash
+    namespace: monitoring
+    version: 0.12.1
+    valuesFile: https://raw.githubusercontent.com/elastic/cloud-on-k8s/2.14/deploy/eck-stack/examples/logstash/basic-eck.yaml
