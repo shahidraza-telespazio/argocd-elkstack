@@ -7,7 +7,7 @@ resources:
   - namespace.yaml
 
 helmCharts:
-  - name: eck-operator-crds
+  - name: eck-operator
     repo: https://helm.elastic.co
     releaseName: eck-crds
     namespace: logging
