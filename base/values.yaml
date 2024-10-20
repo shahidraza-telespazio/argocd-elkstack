@@ -59,9 +59,9 @@ eck-beats:
     config:
       filebeat.yml: |-
         filebeat.config:
-        #  inputs:
-        #    path: ${path.config}/inputs.d/*.yml
-        #    reload.enabled: true
+         inputs:
+           path: ${path.config}/inputs.d/*.yml
+           reload.enabled: true
           modules:
             path: ${path.config}/modules.d/*.yml
             reload.enabled: true
