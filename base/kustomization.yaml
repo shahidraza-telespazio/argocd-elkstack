@@ -17,3 +17,5 @@ helmCharts:
     releaseName: elk
     namespace: logging
     version: 0.12.1
+    valuesFile: values.yaml
+
