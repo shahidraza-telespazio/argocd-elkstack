@@ -1,5 +1,56 @@
 eck-beats:
+  enabled: true
   spec:
+    type: filebeat
+    elasticsearchRef:
+      name: elasticsearch
+    daemonSet:
+      podTemplate:
+        spec:
+          serviceAccountName: filebeat
+          automountServiceAccountToken: true
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - key: dedicated
+              operator: Exists
+              effect: NoSchedule
+          dnsPolicy: ClusterFirstWithHostNet
+          hostNetwork: true # Allows to provide richer host metadata
+          containers:
+            - name: filebeat
+              securityContext:
+                runAsUser: 0
+                # If using Red Hat OpenShift uncomment this:
+                #privileged: true
+              volumeMounts:
+                - name: varlogcontainers
+                  mountPath: /var/log/containers
+                - name: varlogpods
+                  mountPath: /var/log/pods
+                - name: varlibdockercontainers
+                  mountPath: /var/lib/docker/containers
+              env:
+                - name: NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 2000Mi
+                requests:
+                  cpu: 100m
+                  memory: 200Mi
+          volumes:
+            - name: varlogcontainers
+              hostPath:
+                path: /var/log/containers
+            - name: varlogpods
+              hostPath:
+                path: /var/log/pods
+            - name: varlibdockercontainers
+              hostPath:
+                path: /var/lib/docker/containers
     config:
       filebeat.yml: |-
         filebeat.config:
@@ -50,55 +101,18 @@ eck-beats:
                 - 'kubernetes.labels.app'
         output.elasticsearch:
           hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
-
-  daemonSet:
-    podTemplate:
-      spec:
-        serviceAccountName: filebeat
-        automountServiceAccountToken: true
-        terminationGracePeriodSeconds: 30
-        tolerations:
-          - key: dedicated
-            operator: Exists
-            effect: NoSchedule
-        dnsPolicy: ClusterFirstWithHostNet
-        hostNetwork: true # Allows to provide richer host metadata
-        containers:
-          - name: filebeat
-            securityContext:
-              runAsUser: 0
-              # If using Red Hat OpenShift uncomment this:
-              #privileged: true
-            volumeMounts:
-              - name: varlogcontainers
-                mountPath: /var/log/containers
-              - name: varlogpods
-                mountPath: /var/log/pods
-              - name: varlibdockercontainers
-                mountPath: /var/lib/docker/containers
-            env:
-              - name: NODE_NAME
-                valueFrom:
-                  fieldRef:
-                    fieldPath: spec.nodeName
-            resources:
-              limits:
-                cpu: 500m
-                memory: 2000Mi
-              requests:
-                cpu: 100m
-                memory: 200Mi
-        volumes:
-          - name: varlogcontainers
-            hostPath:
-              path: /var/log/containers
-          - name: varlogpods
-            hostPath:
-              path: /var/log/pods
-          - name: varlibdockercontainers
-            hostPath:
-              path: /var/lib/docker/containers
+  clusterRoleBinding:
+    name: filebeat-clusterrolebinding
+    subjects:
+      - kind: ServiceAccount
+        name: filebeat
+        namespace: kube-system
+    roleRef:
+      kind: ClusterRole
+      name: filebeat
+      apiGroup: rbac.authorization.k8s.io
   clusterRole:
+    name: elastic-beat-autodiscover
     rules:
       - apiGroups: [""] # "" indicates the core API group
         resources:
@@ -109,13 +123,3 @@ eck-beats:
           - get
           - watch
           - list
-
-  clusterRoleBinding:
-    subjects:
-      - kind: ServiceAccount
-        name: filebeat
-        namespace: kube-system
-    roleRef:
-      kind: ClusterRole
-      name: filebeat
-      apiGroup: rbac.authorization.k8s.io‍
