@@ -1,5 +1,10 @@
 eck-beats:
   enabled: true
+  metadata:
+  name: filebeat-config
+  namespace: logging
+  labels:
+    kubernetes.io/cluster-service: "true"
   spec:
     type: filebeat
     elasticsearchRef:
@@ -101,8 +106,14 @@ eck-beats:
                 - 'kubernetes.labels.app'
         output.elasticsearch:
           hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+  serviceAccount:
+    name: filebeat
+    namespace: logging
+    labels:
+      k8s-app: filebeat
   clusterRoleBinding:
-    name: filebeat-clusterrolebinding
+    name: filebeat
+    namespace: logging
     subjects:
       - kind: ServiceAccount
         name: filebeat
@@ -112,7 +123,10 @@ eck-beats:
       name: filebeat
       apiGroup: rbac.authorization.k8s.io
   clusterRole:
-    name: elastic-beat-autodiscover
+    name: filebeat
+    namespace: logging
+    labels:
+      k8s-app: filebeat
     rules:
       - apiGroups: [""] # "" indicates the core API group
         resources:
