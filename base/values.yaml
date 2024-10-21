@@ -35,7 +35,7 @@ eck-beats:
             - name: ELASTICSEARCH_USERNAME
               value: elastic
             - name: ELASTICSEARCH_PASSWORD
-              value: jdRoQ804Bv6DQ541T6GYix77
+              value: 6wRJr3jit726sIm850BS5H6e
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
