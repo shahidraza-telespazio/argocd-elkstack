@@ -4,56 +4,77 @@ eck-beats:
     name: filebeat-config
     namespace: logging
     labels:
+      k8s-app: filebeat #not working
       kubernetes.io/cluster-service: "true"
   spec:
     type: filebeat
     elasticsearchRef:
       name: elasticsearch
     daemonSet:
+      metadata:
+        name: filebeat
+        namespace: logging
+      labels:
+        k8s-app: filebeat
       podTemplate:
+        metadata:
+          labels:
+            k8s-app: filebeat
         spec:
           serviceAccountName: filebeat
-          automountServiceAccountToken: true
           terminationGracePeriodSeconds: 30
           tolerations:
-            - key: dedicated
-              operator: Exists
-              effect: NoSchedule
-          dnsPolicy: ClusterFirstWithHostNet
-          hostNetwork: true
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/master
           containers:
             - name: filebeat
+              image: elastic/filebeat:6.5.4
+              args: ["-c", "/usr/share/filebeat/filebeat.yml", "-e"]
+              env:
+                - name: ELASTICSEARCH_HOST
+                  value: elasticsearch.elasticsearch
+                - name: ELASTICSEARCH_PORT
+                  value: "9200"
               securityContext:
                 runAsUser: 0
-              volumeMounts:
-                - name: varlogcontainers
-                  mountPath: /var/log/containers
-                - name: varlogpods
-                  mountPath: /var/log/pods
-                - name: varlibdockercontainers
-                  mountPath: /var/lib/docker/containers
-              env:
-                - name: NODE_NAME
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: spec.nodeName
+                # If using Red Hat OpenShift uncomment this:
+                #privileged: true
               resources:
                 limits:
-                  cpu: 500m
-                  memory: 2000Mi
+                  memory: 200Mi
                 requests:
                   cpu: 100m
-                  memory: 200Mi
+                  memory: 100Mi
+              volumeMounts:
+                - name: config
+                  mountPath: /usr/share/filebeat/filebeat.yml
+                  readOnly: true
+                  subPath: filebeat.yml
+                - name: inputs
+                  mountPath: /usr/share/filebeat/inputs.d
+                  readOnly: true
+                - name: data
+                  mountPath: /usr/share/filebeat/data
+                - name: varlibdockercontainers
+                  mountPath: /var/lib/docker/containers
+                  readOnly: true
           volumes:
-            - name: varlogcontainers
-              hostPath:
-                path: /var/log/containers
-            - name: varlogpods
-              hostPath:
-                path: /var/log/pods
+            - name: config
+              configMap:
+                defaultMode: 0600
+                name: filebeat-config
             - name: varlibdockercontainers
               hostPath:
                 path: /var/lib/docker/containers
+            - name: inputs
+              configMap:
+                defaultMode: 0600
+                name: filebeat-inputs
+            # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
+            - name: data
+              hostPath:
+                path: /var/lib/filebeat-data
+                type: DirectoryOrCreate`
     config:
       filebeat.yml: |-
         filebeat.config:
