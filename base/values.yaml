@@ -29,13 +29,16 @@ eck-beats:
               args: ["-c", "/etc/filebeat.yml", "-e"]
               env:
                 - name: ELASTICSEARCH_HOST
-                  value: https://elasticsearch-es-http
+                  value: http://elasticsearch-es-http
                 - name: ELASTICSEARCH_PORT
                   value: "9200"
                 - name: ELASTICSEARCH_USERNAME
                   value: elastic
                 - name: ELASTICSEARCH_PASSWORD
-                  value: n642MY161He5cphuIT5ArT21
+                  valueFrom:
+                  secretKeyRef:
+                    name: elasticsearch-es-elastic-user
+                    key: elastic
                 - name: NODE_NAME
                   valueFrom:
                     fieldRef:
