@@ -1,125 +1,60 @@
+eck-kibana:
+  spec:
+    elasticsearchRef:
+      name: elasticsearch
+    config:
+      server:
+        publicBaseUrl: <<PATCH>>
+    http:
+      tls:
+        certificate:
+          secretName: kibana-tls
+
 eck-beats:
   enabled: true
   metadata:
     name: filebeat
-    namespace: logging
-    labels:
-      k8s-app: filebeat
-      kubernetes.io/cluster-service: "true"
   spec:
     type: filebeat
     elasticsearchRef:
       name: elasticsearch
+    config:
+      filebeat.inputs:
+        - type: container
+          paths:
+            - /var/log/containers/*.log
+      output.elasticsearch:
+        hosts: ["https://elasticsearch-es-http:9200"]
+        # ssl:
+        #   certificate_authorities: ["/usr/share/elasticsearch/certs/ca.crt"]
     daemonSet:
       podTemplate:
-        metadata:
-          labels:
-            k8s-app: filebeat
         spec:
-          serviceAccountName: filebeat
-          terminationGracePeriodSeconds: 30
-          hostNetwork: true
           dnsPolicy: ClusterFirstWithHostNet
-          tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/master
+          hostNetwork: true
+          securityContext:
+            runAsUser: 0
           containers:
             - name: filebeat
-              image: docker.elastic.co/beats/filebeat:8.15.3
-              args: ["-c", "/etc/filebeat.yml", "-e"]
-              env:
-                - name: ELASTICSEARCH_HOST
-                  value: https://elasticsearch-es-http
-                - name: ELASTICSEARCH_PORT
-                  value: "9200"
-                - name: ELASTICSEARCH_USERNAME
-                  value: elastic
-                - name: ELASTICSEARCH_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: elasticsearch-es-elastic-user
-                      key: elastic
-                - name: NODE_NAME
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: spec.nodeName
-              securityContext:
-                runAsUser: 0
-                # If using Red Hat OpenShift uncomment this:
-                #privileged: true
-              resources:
-                limits:
-                  memory: 200Mi
-                requests:
-                  cpu: 100m
-                  memory: 100Mi
               volumeMounts:
-                - name: config
-                  mountPath: /etc/filebeat.yml
-                  readOnly: true
-                  subPath: filebeat.yml
-                - name: data
-                  mountPath: /usr/share/filebeat/data
+                - name: varlogcontainers
+                  mountPath: /var/log/containers
+                - name: varlogpods
+                  mountPath: /var/log/pods
                 - name: varlibdockercontainers
                   mountPath: /var/lib/docker/containers
-                  readOnly: true
-                - name: varlog
-                  mountPath: /var/log
-                  readOnly: true
+                # - name: es-certs
+                #   mountPath: /usr/share/elasticsearch/certs
           volumes:
-            - name: config
-              configMap:
-                defaultMode: 0640
-                name: filebeat-config
+            - name: varlogcontainers
+              hostPath:
+                path: /var/log/containers
+            - name: varlogpods
+              hostPath:
+                path: /var/log/pods
             - name: varlibdockercontainers
               hostPath:
                 path: /var/lib/docker/containers
-            - name: varlog
-              hostPath:
-                path: /var/log
-              # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
-            - name: data
-              hostPath:
-                # When filebeat runs as non-root user, this directory needs to be writable by group (g+w).
-                path: /var/lib/filebeat-data
-                type: DirectoryOrCreate
-
-  serviceAccount:
-    name: filebeat
-    namespace: logging
-    labels:
-      k8s-app: filebeat
-  clusterRoleBinding:
-    name: filebeat
-    namespace: logging
-    subjects:
-      - kind: ServiceAccount
-        name: filebeat
-        namespace: logging
-    roleRef:
-      kind: ClusterRole
-      name: filebeat
-      apiGroup: rbac.authorization.k8s.io
-  clusterRole:
-    name: filebeat
-    namespace: logging
-    labels:
-      k8s-app: filebeat
-    rules:
-      - apiGroups: [""]
-        resources:
-          - namespaces
-          - pods
-          - nodes
-        verbs:
-          - get
-          - watch
-          - list
-      - apiGroups: ["apps"]
-        resources:
-          - replicasets
-        verbs: ["get", "list", "watch"]
-      - apiGroups: ["batch"]
-        resources:
-          - jobs
-        verbs: ["get", "list", "watch"]
+            # - name: es-certs
+            #   secret:
+            #     secretName: elasticsearch-es-transport-certs-public
