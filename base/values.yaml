@@ -36,9 +36,9 @@ eck-beats:
                   value: elastic
                 - name: ELASTICSEARCH_PASSWORD
                   valueFrom:
-                  secretKeyRef:
-                    name: elasticsearch-es-elastic-user
-                    key: elastic
+                    secretKeyRef:
+                      name: elasticsearch-es-elastic-user
+                      key: elastic
                 - name: NODE_NAME
                   valueFrom:
                     fieldRef:
