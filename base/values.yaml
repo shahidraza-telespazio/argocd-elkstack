@@ -4,7 +4,7 @@ eck-beats:
     name: filebeat-config
     namespace: logging
     labels:
-      k8s-app: filebeat #not working
+      k8s-app: filebeat
       kubernetes.io/cluster-service: "true"
   spec:
     type: filebeat
@@ -14,8 +14,8 @@ eck-beats:
       metadata:
         name: filebeat
         namespace: logging
-      labels:
-        k8s-app: filebeat
+        labels:
+          k8s-app: filebeat
       podTemplate:
         metadata:
           labels:
@@ -74,7 +74,7 @@ eck-beats:
             - name: data
               hostPath:
                 path: /var/lib/filebeat-data
-                type: DirectoryOrCreate`
+                type: DirectoryOrCreate
     config:
       filebeat.yml: |-
         filebeat.config:
