@@ -44,6 +44,7 @@ data:
               fingerprint.enabled: true
               symlinks: true
            file_identity.fingerprint: ~
+          
 
     processors:
       - add_kubernetes_metadata:

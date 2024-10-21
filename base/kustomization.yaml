@@ -5,7 +5,7 @@ namespace: logging
 
 resources:
   - namespace.yaml
-  - configMap.yaml
+  - config-map.yaml
 
 helmCharts:
   - name: eck-operator
