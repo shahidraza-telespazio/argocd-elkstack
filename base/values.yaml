@@ -11,11 +11,6 @@ eck-beats:
     elasticsearchRef:
       name: elasticsearch
     daemonSet:
-      metadata:
-        name: filebeat
-        namespace: logging
-        labels:
-          k8s-app: filebeat
       podTemplate:
         metadata:
           labels:
