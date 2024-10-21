@@ -1,7 +1,7 @@
 eck-beats:
   enabled: true
   metadata:
-    name: filebeat-config
+    name: filebeat
     namespace: logging
     labels:
       k8s-app: filebeat
@@ -54,17 +54,15 @@ eck-beats:
                   mountPath: /var/lib/docker/containers
                   readOnly: true
           volumes:
-            - name: config
-              configMap:
-                defaultMode: 0600
-                name: filebeat-config
+            - name: varlogcontainers
+              hostPath:
+                path: /var/log/containers
+            - name: varlogpods
+              hostPath:
+                path: /var/log/pods
             - name: varlibdockercontainers
               hostPath:
                 path: /var/lib/docker/containers
-            - name: inputs
-              configMap:
-                defaultMode: 0600
-                name: filebeat-inputs
             # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
             - name: data
               hostPath:
@@ -108,17 +106,28 @@ eck-beats:
                         negate: true
                         match: after
         filebeat.inputs:
-          - type: log
+          - type: container
             enabled: true
             paths:
               - /var/log/*.log
         processors:
-          - add_cloud_metadata: ~
-          - drop_fields:
-              when:
-                has_fields: ['kubernetes.labels.app']
-              fields:
-                - 'kubernetes.labels.app'
+           - add_kubernetes_metadata:
+            host: ${NODE_NAME}
+            matchers:
+            - logs_path:
+                logs_path: "/var/log/containers/"
+          - drop_event.when:
+              or:
+              - equals:
+                  kubernetes.namespace: "kube-system"
+              - equals:
+                  kubernetes.namespace: "logging"  
+              - equals:
+                  kubernetes.namespace: "ingress-nginx-controller"
+              - equals:
+                  kubernetes.namespace: "kube-node-lease"
+              - equals:
+                  kubernetes.namespace: "elastic-system"
         output.elasticsearch:
           hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
   serviceAccount:
