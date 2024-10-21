@@ -54,6 +54,9 @@ data:
                 logs_path: "/var/log/containers/"
 
     output.elasticsearch:
+      host: '${NODE_NAME}'
       hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
+      protocol: https
+      ssl.certificate_authorities: ["/usr/share/filebeat/certs/ca.crt"]
