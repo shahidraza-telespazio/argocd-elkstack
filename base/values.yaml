@@ -52,6 +52,17 @@ eck-beats:
 
 eck-logstash:
   enabled: true
+  podTemplate:
+    spec:
+      containers:
+        volumeMounts:
+          - name: ca-certs
+            mountPath: /etc/logstash/certificates
+            readOnly: true
+      volumes:
+        - name: ca-certs
+          secret:
+            secretName: elk-eck-logstash-ls-http-certs-public
   pipelines:
     - pipeline.id: main
       config.string: |
@@ -65,6 +76,7 @@ eck-logstash:
             hosts => "https://elasticsearch-es-http:9200"
             user => "elastic"
             password => "n642MY161He5cphuIT5ArT21"
+            cacert => '/etc/logstash/certificates/ca.crt'
           }
         }
   services:
