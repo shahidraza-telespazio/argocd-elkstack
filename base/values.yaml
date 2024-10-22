@@ -55,10 +55,11 @@ eck-logstash:
   podTemplate:
     spec:
       containers:
-        volumeMounts:
-          - name: ca-certs
-            mountPath: /etc/logstash/certificates
-            readOnly: true
+        - name: logstash
+          volumeMounts:
+            - name: ca-certs
+              mountPath: /etc/logstash/certificates
+              readOnly: true
       volumes:
         - name: ca-certs
           secret:
