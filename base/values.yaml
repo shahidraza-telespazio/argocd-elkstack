@@ -56,6 +56,12 @@ eck-logstash:
     spec:
       containers:
         - name: logstash
+          env:
+            - name: ES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-es-elastic-user
+                  key: elastic
           volumeMounts:
             - name: ca-certs
               mountPath: /etc/logstash/certificates
@@ -76,10 +82,8 @@ eck-logstash:
           elasticsearch {
             hosts => "https://elasticsearch-es-http:9200"
             user => "elastic"
-            password => "n642MY161He5cphuIT5ArT21"
-            ssl => true
-            ssl_certificate_verification => true
-            cacert => "/etc/logstash/certificates/ca.crt"
+            password => "${ES_PASSWORD}"
+            ssl_certificate_authorities => "/etc/logstash/certificates/ca.crt"
           }
         }
   services:
