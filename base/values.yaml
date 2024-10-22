@@ -24,7 +24,7 @@ eck-beats:
           paths:
             - /var/log/containers/*.log
       output.logstash:
-        hosts: ["https://elk-eck-logstash-ls-beats:5044"]
+        hosts: "https://elk-eck-logstash-ls-beats:5044"
     daemonSet:
       podTemplate:
         spec:
