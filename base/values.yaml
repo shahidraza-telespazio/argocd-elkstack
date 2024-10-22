@@ -24,9 +24,7 @@ eck-beats:
           paths:
             - /var/log/containers/*.log
       output.elasticsearch:
-        hosts: ["https://elasticsearch-es-http:9200"]
-        # ssl:
-        #   certificate_authorities: ["/usr/share/elasticsearch/certs/ca.crt"]
+        hosts: ["logstash:5044"]
     daemonSet:
       podTemplate:
         spec:
@@ -42,9 +40,7 @@ eck-beats:
                 - name: varlogpods
                   mountPath: /var/log/pods
                 - name: varlibdockercontainers
-                  mountPath: /var/lib/docker/containers
-                # - name: es-certs
-                #   mountPath: /usr/share/elasticsearch/certs
+                  mountPath: /var/lib/docker/containerss
           volumes:
             - name: varlogcontainers
               hostPath:
@@ -55,6 +51,6 @@ eck-beats:
             - name: varlibdockercontainers
               hostPath:
                 path: /var/lib/docker/containers
-            # - name: es-certs
-            #   secret:
-            #     secretName: elasticsearch-es-transport-certs-public
+
+eck-logstash:
+  enabled: true
