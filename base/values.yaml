@@ -77,7 +77,7 @@ eck-logstash:
             hosts => "https://elasticsearch-es-http:9200"
             user => "elastic"
             password => "n642MY161He5cphuIT5ArT21"
-            cacert => '/etc/logstash/certificates/ca.crt'
+            ssl_certificate_authorities => '/etc/logstash/certificates/ca.crt'
           }
         }
   services:
