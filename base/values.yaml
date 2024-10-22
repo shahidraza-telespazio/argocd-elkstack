@@ -9,8 +9,8 @@ eck-beats:
         - type: container
           paths:
             - /var/log/containers/*.log
-      output.logstash:
-        hosts: "https://elk-eck-logstash-ls-beats:5044"
+      output.elasticsearch:
+        hosts: ["https://elasticsearch-es-http:9200"]
     daemonSet:
       podTemplate:
         spec:
