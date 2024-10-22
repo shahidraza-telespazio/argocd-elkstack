@@ -63,10 +63,7 @@ eck-logstash:
       }
       output {
         elasticsearch {
-          hosts => [ "${ECK_ES_HOSTS}" ]
-          user => "${ECK_ES_USER}"
-          password => "${ECK_ES_PASSWORD}"
-          ssl_certificate_authorities => "${ECK_ES_SSL_CERTIFICATE_AUTHORITY}"
+          hosts => "https://elasticsearch-es-http:9200"
         }
       }
   services:
