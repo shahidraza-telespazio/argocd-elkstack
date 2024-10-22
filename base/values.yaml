@@ -16,8 +16,6 @@ eck-beats:
     name: filebeat
   spec:
     type: filebeat
-    elasticsearchRef:
-      name: elasticsearch
     config:
       filebeat.inputs:
         - type: container
