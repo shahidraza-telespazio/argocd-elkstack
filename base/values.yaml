@@ -63,7 +63,7 @@ eck-logstash:
       volumes:
         - name: ca-certs
           secret:
-            secretName: elk-eck-logstash-ls-http-certs-public
+            secretName: elasticsearch-es-http-certs-public
   pipelines:
     - pipeline.id: main
       config.string: |
