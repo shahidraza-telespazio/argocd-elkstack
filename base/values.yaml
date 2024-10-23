@@ -4,13 +4,16 @@ eck-beats:
     name: filebeat
   spec:
     type: filebeat
+    elasticsearchRef:
+      name: elasticsearch
     config:
       filebeat.inputs:
         - type: container
           paths:
             - /var/log/containers/*.log
+      output.elasticsearch.enabled: false
       output.logstash:
-        hosts: "https://elk-eck-logstash-ls-beats:5044"
+        hosts: ["elk-eck-logstash-ls-beats:5044"]
     daemonSet:
       podTemplate:
         spec:
@@ -26,7 +29,7 @@ eck-beats:
                 - name: varlogpods
                   mountPath: /var/log/pods
                 - name: varlibdockercontainers
-                  mountPath: /var/lib/docker/containerss
+                  mountPath: /var/lib/docker/containers
           volumes:
             - name: varlogcontainers
               hostPath:
@@ -70,6 +73,7 @@ eck-logstash:
             hosts => "https://elasticsearch-es-http:9200"
             user => "elastic"
             password => "${ES_PASSWORD}"
+            ssl_enabled => true
             ssl_certificate_authorities => "/etc/logstash/certificates/ca.crt"
           }
         }
